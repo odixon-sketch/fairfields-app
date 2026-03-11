@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fairfields Fisheries Enterprise</title>
+    <style>
+        :root {
+            --deep-sea: #003366;
+            --grass-green: #2E7D32;
+        }
+        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; border-top: 8px solid var(--deep-sea); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: var(--deep-sea); text-align: center; font-size: 1.5rem; margin-bottom: 5px; }
+        .sub-header { text-align: center; color: var(--grass-green); font-weight: bold; margin-bottom: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
+        select, input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--grass-green); color: white; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        button:active { background: var(--deep-sea); }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fairfields Fisheries</h1>
+    <div class="sub-header">Feed Consumption Log</div>
+
+    <form id="feedForm">
+        <label>Select Pond</label>
+        <select id="pond" required>
+            <option value="">-- Choose Pond --</option>
+            <optgroup label="ETP Ponds">
+                <option>ETP1</option><option>ETP2</option><option>ETP3</option><option>ETP4</option><option>ETP5</option><option>ETP6</option><option>ETP7</option>
+            </optgroup>
+            <optgroup label="FFP Ponds">
+                <option>FFP1</option><option>FFP2</option><option>FFP3</option><option>FFP4</option><option>FFP5</option><option>FFP6</option><option>FFP7</option><option>FFP8</option><option>FFP9</option><option>FFP10</option><option>FFP11</option><option>FFP12</option><option>FFP13</option><option>FFP14</option>
+            </optgroup>
+            <optgroup label="FFPQ Ponds">
+                <option>FFPQ1</option><option>FFPQ2</option>
+            </optgroup>
+        </select>
+
+        <label>Feed Size</label>
+        <select id="feedSize" required>
+            <option value="">-- Select Size --</option>
+            <option>2mm</option><option>3mm</option><option>4mm</option><option>5mm</option><option>6mm</option><option>7mm</option><option>8mm</option>
+        </select>
+
+        <label>Quantity (Kilograms)</label>
+        <input type="number" id="quantity" step="0.1" placeholder="e.g. 5.5" required>
+
+        <label>Staff PIN (4 Digits)</label>
+        <input type="password" id="staffId" maxlength="4" inputmode="numeric" required>
+
+        <button type="submit" id="submitBtn">Submit Records</button>
+    </form>
+    <div id="status"></div>
+</div>
+
+<script>
+    // REPLACE THE URL BELOW WITH YOUR GOOGLE WEB APP URL
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyW-U-v3zQyxj2jd4nZwv2CG8GYkv_oJE5-_1rmWEmMgYI3R91zgeri2tmp57XLWFMNaA/exec";
+
+    document.getElementById('feedForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const status = document.getElementById('status');
+        
+        btn.disabled = true;
+        btn.innerText = "Sending...";
+        status.innerText = "";
+
+        const payload = {
+            pond: document.getElementById('pond').value,
+            feedSize: document.getElementById('feedSize').value,
+            quantity: document.getElementById('quantity').value,
+            staffId: document.getElementById('staffId').value
+        };
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Necessary for Google Script
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            status.style.color = "green";
+            status.innerText = "Data logged successfully!";
+            document.getElementById('feedForm').reset();
+            btn.disabled = false;
+            btn.innerText = "Submit Records";
+        })
+        .catch(err => {
+            status.style.color = "red";
+            status.innerText = "Error! Please try again.";
+            btn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
