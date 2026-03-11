@@ -3,102 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fairfields Fisheries Enterprise</title>
+    <title>Fairfields Fisheries - Bulk Log</title>
     <style>
-        :root {
-            --deep-sea: #003366;
-            --grass-green: #2E7D32;
-        }
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; border-top: 8px solid var(--deep-sea); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: var(--deep-sea); text-align: center; font-size: 1.5rem; margin-bottom: 5px; }
+        :root { --deep-sea: #003366; --grass-green: #2E7D32; }
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 15px; border-radius: 12px; border-top: 10px solid var(--deep-sea); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: var(--deep-sea); text-align: center; margin-bottom: 5px; font-size: 1.4rem; }
         .sub-header { text-align: center; color: var(--grass-green); font-weight: bold; margin-bottom: 20px; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
-        select, input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 15px; margin-top: 25px; background: var(--grass-green); color: white; border: none; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        button:active { background: var(--deep-sea); }
-        #status { text-align: center; margin-top: 15px; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { background: #eee; padding: 10px; text-align: left; position: sticky; top: 0; }
+        td { border-bottom: 1px solid #ddd; padding: 8px 5px; }
+        
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        input:focus { border-color: var(--grass-green); outline: none; }
+        
+        .footer-section { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; }
+        button { width: 100%; padding: 18px; background: var(--grass-green); color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        button:disabled { background: #ccc; }
+        
+        .pond-label { font-weight: bold; color: var(--deep-sea); }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; padding: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Fairfields Fisheries</h1>
-    <div class="sub-header">Feed Consumption Log</div>
+    <div class="sub-header">Daily Batch Feed Entry</div>
 
-    <form id="feedForm">
-        <label>Select Pond</label>
-        <select id="pond" required>
-            <option value="">-- Choose Pond --</option>
-            <optgroup label="ETP Ponds">
-                <option>ETP1</option><option>ETP2</option><option>ETP3</option><option>ETP4</option><option>ETP5</option><option>ETP6</option><option>ETP7</option>
-            </optgroup>
-            <optgroup label="FFP Ponds">
-                <option>FFP1</option><option>FFP2</option><option>FFP3</option><option>FFP4</option><option>FFP5</option><option>FFP6</option><option>FFP7</option><option>FFP8</option><option>FFP9</option><option>FFP10</option><option>FFP11</option><option>FFP12</option><option>FFP13</option><option>FFP14</option>
-            </optgroup>
-            <optgroup label="FFPQ Ponds">
-                <option>FFPQ1</option><option>FFPQ2</option>
-            </optgroup>
-        </select>
+    <form id="bulkForm">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Pond</th>
+                    <th style="width: 40%;">Feed Size</th>
+                    <th style="width: 35%;">Qty (kg)</th>
+                </tr>
+            </thead>
+            <tbody id="gridBody">
+                </tbody>
+        </table>
 
-        <label>Feed Size</label>
-        <select id="feedSize" required>
-            <option value="">-- Select Size --</option>
-            <option>2mm</option><option>3mm</option><option>4mm</option><option>5mm</option><option>6mm</option><option>7mm</option><option>8mm</option>
-        </select>
-
-        <label>Quantity (Kilograms)</label>
-        <input type="number" id="quantity" step="0.1" placeholder="e.g. 5.5" required>
-
-        <label>Staff PIN (4 Digits)</label>
-        <input type="password" id="staffId" maxlength="4" inputmode="numeric" required>
-
-        <button type="submit" id="submitBtn">Submit Records</button>
+        <div class="footer-section">
+            <label><strong>Staff PIN (Required to Save)</strong></label>
+            <input type="password" id="staffId" maxlength="4" inputmode="numeric" placeholder="Enter 4-digit PIN" required>
+            <button type="submit" id="submitBtn">Submit All Records</button>
+        </div>
     </form>
     <div id="status"></div>
 </div>
 
 <script>
-    // REPLACE THE URL BELOW WITH YOUR GOOGLE WEB APP URL
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyW-U-v3zQyxj2jd4nZwv2CG8GYkv_oJE5-_1rmWEmMgYI3R91zgeri2tmp57XLWFMNaA/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxutOF3RfDs9gmHlNT7sVwwz9ozeB7tn6dhn6pDk8JOW76xrrrJjVUZNB6qT48f8YY8jQ/exec"; // https://script.google.com/macros/s/AKfycbxutOF3RfDs9gmHlNT7sVwwz9ozeB7tn6dhn6pDk8JOW76xrrrJjVUZNB6qT48f8YY8jQ/exec
+    const ponds = [
+        "ETP1", "ETP2", "ETP3", "ETP4", "ETP5", "ETP6", "ETP7",
+        "FFP1", "FFP2", "FFP3", "FFP4", "FFP5", "FFP6", "FFP7", "FFP8", "FFP9", "FFP10", "FFP11", "FFP12", "FFP13", "FFP14",
+        "FFPQ1", "FFPQ2"
+    ];
+    const feedSizes = ["2mm", "3mm", "4mm", "5mm", "6mm", "7mm", "8mm"];
 
-    document.getElementById('feedForm').addEventListener('submit', function(e) {
+    // Generate the table rows
+    const tbody = document.getElementById('gridBody');
+    ponds.forEach(pond => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="pond-label">${pond}</td>
+            <td>
+                <select class="feed-size">
+                    <option value="">-- Size --</option>
+                    ${feedSizes.map(s => `<option value="${s}">${s}</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <input type="number" class="qty" step="0.1" placeholder="0.0">
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.getElementById('bulkForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         const status = document.getElementById('status');
+        const staffId = document.getElementById('staffId').value;
         
-        btn.disabled = true;
-        btn.innerText = "Sending...";
-        status.innerText = "";
+        // Collect all rows that have data
+        const rows = document.querySelectorAll('#gridBody tr');
+        const dataToSubmit = [];
 
-        const payload = {
-            pond: document.getElementById('pond').value,
-            feedSize: document.getElementById('feedSize').value,
-            quantity: document.getElementById('quantity').value,
-            staffId: document.getElementById('staffId').value
-        };
+        rows.forEach(row => {
+            const pond = row.querySelector('.pond-label').innerText;
+            const size = row.querySelector('.feed-size').value;
+            const qty = row.querySelector('.qty').value;
+
+            // Only add if Quantity is filled
+            if (qty && qty > 0) {
+                dataToSubmit.push({
+                    pond: pond,
+                    feedSize: size || "Not Specified",
+                    quantity: qty,
+                    staffId: staffId
+                });
+            }
+        });
+
+        if (dataToSubmit.length === 0) {
+            alert("Please enter at least one pond's feed data.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Uploading " + dataToSubmit.length + " records...";
 
         fetch(WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors', // Necessary for Google Script
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            mode: 'no-cors',
+            body: JSON.stringify(dataToSubmit)
         })
         .then(() => {
             status.style.color = "green";
-            status.innerText = "Data logged successfully!";
-            document.getElementById('feedForm').reset();
+            status.innerHTML = "Successfully saved " + dataToSubmit.length + " records!<br>Check the Google Sheet.";
+            document.getElementById('bulkForm').reset();
+            window.scrollTo(0,0);
             btn.disabled = false;
-            btn.innerText = "Submit Records";
+            btn.innerText = "Submit All Records";
         })
         .catch(err => {
             status.style.color = "red";
-            status.innerText = "Error! Please try again.";
+            status.innerText = "Error. Check internet and try again.";
             btn.disabled = false;
         });
     });
 </script>
-
 </body>
 </html>
